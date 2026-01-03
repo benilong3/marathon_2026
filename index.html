@@ -152,6 +152,13 @@
       border-radius: 999px;
     }
 
+    /* ✅ NEW: make the weeks container control spacing */
+    #weeks{
+      display:flex;
+      flex-direction:column;
+      gap: 16px; /* space between each week card */
+    }
+
     .week{
       background: linear-gradient(180deg, rgba(18,26,51,.9), rgba(15,23,48,.9));
       border: 1px solid var(--stroke);
@@ -160,8 +167,9 @@
       overflow:hidden;
     }
 
+    /* ✅ UPDATED: more padding in the week header */
     .week-top{
-      padding: 14px 16px;
+      padding: 18px 18px; /* was 14px 16px */
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -207,8 +215,9 @@
       flex: 0 0 auto;
     }
 
+    /* ✅ UPDATED: more padding inside the days section */
     .days{
-      padding: 8px 16px 14px;
+      padding: 12px 18px 18px; /* was 8px 16px 14px */
     }
 
     .day{
