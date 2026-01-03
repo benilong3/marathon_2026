@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Marathon Training Tracker</title>
+
+  <style>
+    :root{
+      --bg0:#0b1020;
+      --bg1:#0e1630;
+      --card:#121a33;
+      --card2:#0f1730;
+      --stroke:rgba(255,255,255,.08);
+      --text:#e6e8f2;
+      --muted:rgba(230,232,242,.68);
+      --muted2:rgba(230,232,242,.5);
+      --accent:#7c5cff;
+      --accent2:#36d1ff;
+      --success:#2ee59d;
+      --danger:#ff5c7a;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --shadow2: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% -10%, rgba(124,92,255,.35), transparent 55%),
+        radial-gradient(900px 600px at 90% 10%, rgba(54,209,255,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
+    }
+
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: rgba(11,16,32,.72);
+      border-bottom: 1px solid var(--stroke);
+    }
+
+    .header-inner{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .title-wrap{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    h1{
+      margin:0;
+      font-size: 1.25rem;
+      letter-spacing:.2px;
+      font-weight: 750;
+    }
+
+    .subtitle{
+      margin:0;
+      font-size:.9rem;
+      color: var(--muted);
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(124,92,255,.14);
+      border: 1px solid rgba(124,92,255,.28);
+      color: var(--text);
+      font-size:.9rem;
+      white-space:nowrap;
+    }
+
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 0 3px rgba(124,92,255,.18);
+    }
+
+    main{
+      max-width: 980px;
+      margin: 24px auto 60px;
+      padding: 0 16px;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .progress-card{
+      background: linear-gradient(180deg, rgba(18,26,51,.92), rgba(15,23,48,.92));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding: 16px;
+    }
+
+    .progress-header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 12px;
+    }
+
+    .progress-header h2{
+      margin:0;
+      font-size: 1.05rem;
+      font-weight: 750;
+      letter-spacing:.2px;
+    }
+
+    #progress-text{
+      margin:0;
+      color: var(--muted);
+      font-weight: 650;
+      font-size:.95rem;
+    }
+
+    .progress-bar-container{
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.35s ease;
+      border-radius: 999px;
+    }
+
+    .week{
+      background: linear-gradient(180deg, rgba(18,26,51,.9), rgba(15,23,48,.9));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+
+    .week-top{
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.02);
+    }
+
+    .week-left{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width: 0;
+    }
+
+    .week-top h2{
+      margin:0;
+      font-size: 1.02rem;
+      font-weight: 800;
+      letter-spacing:.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .week-sub{
+      font-size:.86rem;
+      color: var(--muted);
+      font-weight: 650;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .week-chip{
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size:.82rem;
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      white-space:nowrap;
+      flex: 0 0 auto;
+    }
+
+    .days{
+      padding: 8px 16px 14px;
+    }
+
+    .day{
+      display:flex;
+      align-items:flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .day:last-child{ border-bottom:none; }
+
+    .day input[type="checkbox"]{
+      appearance:none;
+      -webkit-appearance:none;
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      margin-top: 2px;
+      transition: transform .06s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+      flex: 0 0 auto;
+    }
+    .day input[type="checkbox"]:hover{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 0 0 4px rgba(124,92,255,.12);
+    }
+    .day input[type="checkbox"]:active{
+      transform: scale(.96);
+    }
+    .day input[type="checkbox"]::after{
+      content:"";
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid #0b1020;
+      border-bottom: 2px solid #0b1020;
+      transform: rotate(-45deg) scale(0);
+      transition: transform .15s ease;
+      margin-top:-2px;
+    }
+    .day input[type="checkbox"]:checked{
+      background: linear-gradient(90deg, var(--success), rgba(54,209,255,.9));
+      border-color: rgba(46,229,157,.6);
+      box-shadow: 0 0 0 4px rgba(46,229,157,.12);
+    }
+    .day input[type="checkbox"]:checked::after{
+      transform: rotate(-45deg) scale(1);
+    }
+
+    label{
+      cursor:pointer;
+      line-height:1.25;
+      display:block;
+      width: 100%;
+      color: var(--text);
+    }
+
+    .meta{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom: 2px;
+    }
+
+    .dow{
+      font-weight: 800;
+      letter-spacing:.2px;
+      color: rgba(230,232,242,.92);
+    }
+
+    .activity{
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .completed{
+      opacity: .55;
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: rgba(255,255,255,.18);
+    }
+
+    @media (max-width: 520px){
+      .badge{ display:none; }
+      h1{ font-size:1.1rem; }
+      .subtitle{ font-size:.85rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="title-wrap">
+        <h1>Marathon Training Tracker</h1>
+        <p class="subtitle">Jan 5 → Mar 29 • Check off workouts as you go</p>
+      </div>
+      <div class="badge"><span class="dot"></span><span id="badge-text">0% Complete</span></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="layout">
+      <section class="progress-card">
+        <div class="progress-header">
+          <h2>Progress</h2>
+          <p id="progress-text">0% Complete</p>
+        </div>
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+      </section>
+
+      <div id="weeks"></div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js"></script>
+  <script>
+    // ====== DATES ======
+    // Jan 5, 2026 (Mon) -> Mar 29, 2026 (Sun)
+    const startDate = new Date(2026, 0, 5);
+    const raceDate  = new Date(2026, 2, 29);
+
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+    // ====== 12-WEEK MARATHON PLAN (Mon->Sun) ======
+    const weeks = [
+      { name: "Consistent running schedule", miles: 15, days: [
+        "3 mi EZ",
+        "REST",
+        "4 mi EZ",
+        "REST",
+        "3 mi EZ",
+        "5 mi EZ",
+        "REST",
+      ]},
+      { name: "Let’s get started", miles: 21, days: [
+        "3 mi EZ",
+        "WU 1 mi + (3×1 mi EZ) w/ 3:00 rest — get used to intervals",
+        "4 mi EZ",
+        "REST",
+        "3 mi EZ",
+        "6 mi EZ",
+        "REST",
+      ]},
+      { name: "Ready or not, here we go!", miles: 26, days: [
+        "4 mi EZ",
+        "WU 1 mi + 8×400m w/ 2:00 rest (or 6×90s if no track) + CD 1 mi",
+        "6 mi EZ",
+        "REST",
+        "4 mi EZ",
+        "8 mi EZ",
+        "REST",
+      ]},
+      { name: "Getting in the groove", miles: 33, days: [
+        "5 mi EZ",
+        "WU 1 mi + 2×2 mi (3:00 rest) faster-than-EZ but manageable + CD 1 mi",
+        "8 mi EZ",
+        "REST",
+        "4 mi EZ",
+        "10 mi EZ",
+        "REST",
+      ]},
+      { name: "You’ve got this", miles: 39, days: [
+        "5 mi EZ",
+        "WU 2 mi + 4 mi TEMPO (~30–40s slower than 5K PR pace) + CD 2 mi",
+        "8 mi EZ",
+        "REST",
+        "5 mi EZ",
+        "13 mi EZ",
+        "REST",
+      ]},
+      { name: "Rest-ish week", miles: 35, days: [
+        "6 mi EZ",
+        "WU 1 mi + 4×1 mi @ TEMPO (3:00 rest) + CD 1 mi",
+        "8 mi EZ",
+        "REST",
+        "3 mi EZ",
+        "12 mi EZ",
+        "REST",
+      ]},
+      { name: "Increasing mileage", miles: 44, days: [
+        "6 mi EZ",
+        "WU 2 mi + 3×2 mi (3:00 rest) hard/steady + CD 2 mi",
+        "9 mi EZ",
+        "REST",
+        "4 mi EZ",
+        "15 mi EZ",
+        "REST",
+      ]},
+      { name: "Show them what you’re made of", miles: 44, days: [
+        "6 mi EZ",
+        "WU 2 mi + 8×400m hard (2:00 rest) + CD 2 mi",
+        "10 mi EZ",
+        "REST",
+        "4 mi EZ",
+        "18 mi EZ",
+        "REST",
+      ]},
+      { name: "Peak week", miles: 47, days: [
+        "5 mi EZ",
+        "WU 1 mi + 5×1 mi hard (2:00 rest) + CD 1 mi",
+        "12 mi EZ",
+        "REST",
+        "3 mi EZ",
+        "20 mi EZ",
+        "REST",
+      ]},
+      { name: "Start of taper", miles: 38, days: [
+        "4 mi EZ",
+        "WU 1 mi + 3×2 mi (~40s slower than 5K PR pace) (3:00 rest) + CD 1 mi",
+        "10 mi EZ",
+        "REST",
+        "REST",
+        "16 mi EZ",
+        "REST",
+      ]},
+      { name: "Taper week", miles: 30, days: [
+        "4 mi EZ",
+        "WU 1 mi + 6×400m hard (2:00 rest) + CD 1 mi",
+        "6 mi EZ",
+        "REST",
+        "4 mi EZ",
+        "13 mi EZ",
+        "REST",
+      ]},
+      { name: "Race Week!", miles: 41.2, days: [
+        "4 mi EZ",
+        "REST",
+        "5 mi EZ",
+        "3 mi EZ",
+        "REST",
+        "3 mi EZ",
+        "26.2 mi — RACE DAY",
+      ]},
+    ];
+
+    // ====== DATE HELPERS ======
+    function suffix(day) {
+      if (day >= 11 && day <= 13) return "th";
+      const last = day % 10;
+      if (last === 1) return "st";
+      if (last === 2) return "nd";
+      if (last === 3) return "rd";
+      return "th";
+    }
+
+    function formatDate(d) {
+      const months = [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+      ];
+      const dayNum = d.getDate();
+      return `${months[d.getMonth()]} ${dayNum}${suffix(dayNum)}`;
+    }
+
+    function addDays(date, daysToAdd) {
+      const d = new Date(date);
+      d.setDate(d.getDate() + daysToAdd);
+      return d;
+    }
+
+    // ====== BUILD SCHEDULE WITH DATES ======
+    const schedule = weeks.map((w, wIdx) => {
+      return w.days.map((activity, dIdx) => ({
+        dow: days[dIdx],
+        text: `${activity} — ${formatDate(addDays(startDate, wIdx * 7 + dIdx))}`
+      }));
+    });
+
+    // Safety check: last day matches raceDate
+    const lastDate = addDays(startDate, weeks.length * 7 - 1);
+    if (lastDate.toDateString() !== raceDate.toDateString()) {
+      console.warn("Date range mismatch. Expected:", raceDate, "Got:", lastDate);
+    }
+
+    // ====== RENDER UI ======
+    const weeksContainer = document.getElementById("weeks");
+    const progressBar = document.getElementById("progress-bar");
+    const progressText = document.getElementById("progress-text");
+    const badgeText = document.getElementById("badge-text");
+
+    const totalDays = schedule.flat().length;
+
+    schedule.forEach((weekData, weekIndex) => {
+      const weekDiv = document.createElement("div");
+      weekDiv.classList.add("week");
+
+      const weekTop = document.createElement("div");
+      weekTop.classList.add("week-top");
+
+      const left = document.createElement("div");
+      left.classList.add("week-left");
+
+      const weekTitle = document.createElement("h2");
+      weekTitle.textContent = `Week ${weekIndex + 1}`;
+
+      const weekSub = document.createElement("div");
+      weekSub.classList.add("week-sub");
+      weekSub.textContent = `${weeks[weekIndex].name}`;
+
+      left.appendChild(weekTitle);
+      left.appendChild(weekSub);
+
+      const weekChip = document.createElement("div");
+      weekChip.classList.add("week-chip");
+      weekChip.textContent = `${weeks[weekIndex].miles} mi • Mon→Sun`;
+
+      weekTop.appendChild(left);
+      weekTop.appendChild(weekChip);
+
+      const daysWrap = document.createElement("div");
+      daysWrap.classList.add("days");
+
+      weekData.forEach((item, dayIndex) => {
+        const dayDiv = document.createElement("div");
+        dayDiv.classList.add("day");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+
+        // Persistence key (unique for this marathon plan)
+        const checkboxId = `mar-jan5-2026-week${weekIndex + 1}-day${dayIndex + 1}`;
+        checkbox.id = checkboxId;
+        checkbox.checked = store.get(checkboxId) || false;
+
+        const label = document.createElement("label");
+        label.setAttribute("for", checkboxId);
+
+        const meta = document.createElement("div");
+        meta.classList.add("meta");
+
+        const dowSpan = document.createElement("span");
+        dowSpan.classList.add("dow");
+        dowSpan.textContent = item.dow;
+
+        const activitySpan = document.createElement("span");
+        activitySpan.classList.add("activity");
+        activitySpan.textContent = item.text;
+
+        meta.appendChild(dowSpan);
+        meta.appendChild(activitySpan);
+        label.appendChild(meta);
+
+        if (checkbox.checked) label.classList.add("completed");
+
+        checkbox.addEventListener("change", () => {
+          store.set(checkboxId, checkbox.checked);
+          label.classList.toggle("completed", checkbox.checked);
+          updateProgress();
+        });
+
+        dayDiv.appendChild(checkbox);
+        dayDiv.appendChild(label);
+        daysWrap.appendChild(dayDiv);
+      });
+
+      weekDiv.appendChild(weekTop);
+      weekDiv.appendChild(daysWrap);
+      weeksContainer.appendChild(weekDiv);
+    });
+
+    function updateProgress() {
+      const allCheckboxes = document.querySelectorAll("input[type='checkbox']");
+      const checked = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+      const percent = Math.round((checked / totalDays) * 100);
+
+      progressBar.style.width = `${percent}%`;
+      progressText.textContent = `${percent}% Complete`;
+      badgeText.textContent = `${percent}% Complete`;
+    }
+
+    updateProgress();
+  </script>
+</body>
+</html>
