@@ -22,6 +22,7 @@
       --shadow: 0 18px 60px rgba(0,0,0,.45);
       --shadow2: 0 10px 30px rgba(0,0,0,.35);
       --radius: 16px;
+      --weekGap: 16px; /* ✅ control gap between weeks here */
     }
 
     *{ box-sizing:border-box; }
@@ -152,11 +153,12 @@
       border-radius: 999px;
     }
 
-    /* ✅ NEW: make the weeks container control spacing */
+    /* ✅ GUARANTEED spacing between week cards */
     #weeks{
-      display:flex;
+      display:flex;               /* makes gap work reliably */
       flex-direction:column;
-      gap: 16px; /* space between each week card */
+      gap: var(--weekGap);        /* the actual space between cards */
+      padding-top: 2px;           /* tiny breathing room under progress card */
     }
 
     .week{
@@ -165,11 +167,16 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow2);
       overflow:hidden;
+
+      /* ✅ fallback spacing (in case a browser ignores gap) */
+      margin-bottom: var(--weekGap);
+    }
+    .week:last-child{
+      margin-bottom: 0; /* don’t add extra space after final week */
     }
 
-    /* ✅ UPDATED: more padding in the week header */
     .week-top{
-      padding: 18px 18px; /* was 14px 16px */
+      padding: 18px 18px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -215,9 +222,8 @@
       flex: 0 0 auto;
     }
 
-    /* ✅ UPDATED: more padding inside the days section */
     .days{
-      padding: 12px 18px 18px; /* was 8px 16px 14px */
+      padding: 12px 18px 18px;
     }
 
     .day{
@@ -248,9 +254,7 @@
       border-color: rgba(124,92,255,.55);
       box-shadow: 0 0 0 4px rgba(124,92,255,.12);
     }
-    .day input[type="checkbox"]:active{
-      transform: scale(.96);
-    }
+    .day input[type="checkbox"]:active{ transform: scale(.96); }
     .day input[type="checkbox"]::after{
       content:"";
       width: 10px;
@@ -351,112 +355,40 @@
     // ====== 12-WEEK MARATHON PLAN (Mon->Sun) ======
     const weeks = [
       { name: "Consistent running schedule", miles: 15, days: [
-        "3 mi EZ",
-        "REST",
-        "4 mi EZ",
-        "REST",
-        "3 mi EZ",
-        "5 mi EZ",
-        "REST",
+        "3 mi EZ","REST","4 mi EZ","REST","3 mi EZ","5 mi EZ","REST",
       ]},
       { name: "Let’s get started", miles: 21, days: [
-        "3 mi EZ",
-        "WU 1 mi + (3×1 mi EZ) w/ 3:00 rest — get used to intervals",
-        "4 mi EZ",
-        "REST",
-        "3 mi EZ",
-        "6 mi EZ",
-        "REST",
+        "3 mi EZ","WU 1 mi + (3×1 mi EZ) w/ 3:00 rest — get used to intervals","4 mi EZ","REST","3 mi EZ","6 mi EZ","REST",
       ]},
       { name: "Ready or not, here we go!", miles: 26, days: [
-        "4 mi EZ",
-        "WU 1 mi + 8×400m w/ 2:00 rest (or 6×90s if no track) + CD 1 mi",
-        "6 mi EZ",
-        "REST",
-        "4 mi EZ",
-        "8 mi EZ",
-        "REST",
+        "4 mi EZ","WU 1 mi + 8×400m w/ 2:00 rest (or 6×90s if no track) + CD 1 mi","6 mi EZ","REST","4 mi EZ","8 mi EZ","REST",
       ]},
       { name: "Getting in the groove", miles: 33, days: [
-        "5 mi EZ",
-        "WU 1 mi + 2×2 mi (3:00 rest) faster-than-EZ but manageable + CD 1 mi",
-        "8 mi EZ",
-        "REST",
-        "4 mi EZ",
-        "10 mi EZ",
-        "REST",
+        "5 mi EZ","WU 1 mi + 2×2 mi (3:00 rest) faster-than-EZ but manageable + CD 1 mi","8 mi EZ","REST","4 mi EZ","10 mi EZ","REST",
       ]},
       { name: "You’ve got this", miles: 39, days: [
-        "5 mi EZ",
-        "WU 2 mi + 4 mi TEMPO (~30–40s slower than 5K PR pace) + CD 2 mi",
-        "8 mi EZ",
-        "REST",
-        "5 mi EZ",
-        "13 mi EZ",
-        "REST",
+        "5 mi EZ","WU 2 mi + 4 mi TEMPO (~30–40s slower than 5K PR pace) + CD 2 mi","8 mi EZ","REST","5 mi EZ","13 mi EZ","REST",
       ]},
       { name: "Rest-ish week", miles: 35, days: [
-        "6 mi EZ",
-        "WU 1 mi + 4×1 mi @ TEMPO (3:00 rest) + CD 1 mi",
-        "8 mi EZ",
-        "REST",
-        "3 mi EZ",
-        "12 mi EZ",
-        "REST",
+        "6 mi EZ","WU 1 mi + 4×1 mi @ TEMPO (3:00 rest) + CD 1 mi","8 mi EZ","REST","3 mi EZ","12 mi EZ","REST",
       ]},
       { name: "Increasing mileage", miles: 44, days: [
-        "6 mi EZ",
-        "WU 2 mi + 3×2 mi (3:00 rest) hard/steady + CD 2 mi",
-        "9 mi EZ",
-        "REST",
-        "4 mi EZ",
-        "15 mi EZ",
-        "REST",
+        "6 mi EZ","WU 2 mi + 3×2 mi (3:00 rest) hard/steady + CD 2 mi","9 mi EZ","REST","4 mi EZ","15 mi EZ","REST",
       ]},
       { name: "Show them what you’re made of", miles: 44, days: [
-        "6 mi EZ",
-        "WU 2 mi + 8×400m hard (2:00 rest) + CD 2 mi",
-        "10 mi EZ",
-        "REST",
-        "4 mi EZ",
-        "18 mi EZ",
-        "REST",
+        "6 mi EZ","WU 2 mi + 8×400m hard (2:00 rest) + CD 2 mi","10 mi EZ","REST","4 mi EZ","18 mi EZ","REST",
       ]},
       { name: "Peak week", miles: 47, days: [
-        "5 mi EZ",
-        "WU 1 mi + 5×1 mi hard (2:00 rest) + CD 1 mi",
-        "12 mi EZ",
-        "REST",
-        "3 mi EZ",
-        "20 mi EZ",
-        "REST",
+        "5 mi EZ","WU 1 mi + 5×1 mi hard (2:00 rest) + CD 1 mi","12 mi EZ","REST","3 mi EZ","20 mi EZ","REST",
       ]},
       { name: "Start of taper", miles: 38, days: [
-        "4 mi EZ",
-        "WU 1 mi + 3×2 mi (~40s slower than 5K PR pace) (3:00 rest) + CD 1 mi",
-        "10 mi EZ",
-        "REST",
-        "REST",
-        "16 mi EZ",
-        "REST",
+        "4 mi EZ","WU 1 mi + 3×2 mi (~40s slower than 5K PR pace) (3:00 rest) + CD 1 mi","10 mi EZ","REST","REST","16 mi EZ","REST",
       ]},
       { name: "Taper week", miles: 30, days: [
-        "4 mi EZ",
-        "WU 1 mi + 6×400m hard (2:00 rest) + CD 1 mi",
-        "6 mi EZ",
-        "REST",
-        "4 mi EZ",
-        "13 mi EZ",
-        "REST",
+        "4 mi EZ","WU 1 mi + 6×400m hard (2:00 rest) + CD 1 mi","6 mi EZ","REST","4 mi EZ","13 mi EZ","REST",
       ]},
       { name: "Race Week!", miles: 41.2, days: [
-        "4 mi EZ",
-        "REST",
-        "5 mi EZ",
-        "3 mi EZ",
-        "REST",
-        "3 mi EZ",
-        "26.2 mi — RACE DAY",
+        "4 mi EZ","REST","5 mi EZ","3 mi EZ","REST","3 mi EZ","26.2 mi — RACE DAY",
       ]},
     ];
 
@@ -471,10 +403,7 @@
     }
 
     function formatDate(d) {
-      const months = [
-        "January","February","March","April","May","June",
-        "July","August","September","October","November","December"
-      ];
+      const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
       const dayNum = d.getDate();
       return `${months[d.getMonth()]} ${dayNum}${suffix(dayNum)}`;
     }
@@ -544,7 +473,6 @@
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
 
-        // Persistence key (unique for this marathon plan)
         const checkboxId = `mar-jan5-2026-week${weekIndex + 1}-day${dayIndex + 1}`;
         checkbox.id = checkboxId;
         checkbox.checked = store.get(checkboxId) || false;
